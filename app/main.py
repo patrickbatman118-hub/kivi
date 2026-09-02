@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import memory
+from app.routers import memory, pipeline
 
 app = FastAPI(
     title="Kivi",
@@ -8,6 +8,7 @@ app = FastAPI(
 )
 
 app.include_router(memory.router)
+app.include_router(pipeline.router)
 
 @app.get("/health")
 async def health_check():

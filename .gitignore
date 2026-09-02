@@ -10,3 +10,7 @@ env/
 venv/
 *.sqlite3
 .DS_Store
+
+# Session history and evaluation docs (internal use only)
+SESSION_CONTEXT.md
+EVALUATION.md

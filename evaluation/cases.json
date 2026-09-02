@@ -1,0 +1,565 @@
+{
+  "evaluation_version": "1.0",
+  "description": "Kivi phonetic memory system evaluation cases. Designed before implementation. Each case specifies inputs, required memory state, expected output, expected decision, and the reason the system should give for its decision.",
+  "categories": {
+
+    "C1_correct_interventions": {
+      "description": "Cases where memory exists and should be applied. System must intervene.",
+      "cases": [
+        {
+          "id": "C1_01",
+          "name": "Basic person name correction via exact variant match",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya", "aditya"]
+            }
+          ],
+          "asr_output": "ask aditya to review the pull request",
+          "formatted_output": "Ask Aditya to review the pull request.",
+          "expected_memory_aware_output": "Ask Aaditya to review the pull request.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+            }
+          ]
+        },
+        {
+          "id": "C1_02",
+          "name": "Product name correction — common misspelling",
+          "memory_state": [
+            {
+              "canonical_form": "Kivi",
+              "category": "product_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Kiwi", "kiwi", "keevee"]
+            }
+          ],
+          "asr_output": "open the kiwi app on my laptop",
+          "formatted_output": "Open the Kiwi app on my laptop.",
+          "expected_memory_aware_output": "Open the Kivi app on my laptop.",
+          "expected_decisions": [
+            {
+              "token": "Kiwi",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Kiwi' is a known variant of 'Kivi'"
+            }
+          ]
+        },
+        {
+          "id": "C1_03",
+          "name": "Acronym correction — lowercase to correct casing",
+          "memory_state": [
+            {
+              "canonical_form": "NLP",
+              "category": "acronym",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Nlp", "nlp", "N.L.P"]
+            }
+          ],
+          "asr_output": "the nlp pipeline needs to be retrained",
+          "formatted_output": "The Nlp pipeline needs to be retrained.",
+          "expected_memory_aware_output": "The NLP pipeline needs to be retrained.",
+          "expected_decisions": [
+            {
+              "token": "Nlp",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Nlp' is a known variant of 'NLP'"
+            }
+          ]
+        },
+        {
+          "id": "C1_04",
+          "name": "Multiple memories active — only the matched one applied",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            },
+            {
+              "canonical_form": "Sarvam",
+              "category": "org_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Saram", "Sarwam"]
+            }
+          ],
+          "asr_output": "aditya works at sarvam on the kivi project",
+          "formatted_output": "Aditya works at Sarvam on the Kivi project.",
+          "expected_memory_aware_output": "Aaditya works at Sarvam on the Kivi project.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+            },
+            {
+              "token": "Sarvam",
+              "decision": "PASS",
+              "reason": "No match found in memory"
+            }
+          ],
+          "note": "Sarvam is in memory but 'Sarvam' is not a variant of it — 'Saram' and 'Sarwam' are. The canonical form itself is not a variant. Token matches canonical directly so it is already correct — system must pass it through unchanged."
+        },
+        {
+          "id": "C1_05",
+          "name": "Correction-sourced memory applied on next transcript",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "manual_correction",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "schedule a meeting with aditya tomorrow",
+          "formatted_output": "Schedule a meeting with Aditya tomorrow.",
+          "expected_memory_aware_output": "Schedule a meeting with Aaditya tomorrow.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya' (source: manual_correction)"
+            }
+          ]
+        },
+        {
+          "id": "C1_06",
+          "name": "Technical term with unusual casing",
+          "memory_state": [
+            {
+              "canonical_form": "PyTorch",
+              "category": "technical_term",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Pytorch", "pytorch", "pie torch"]
+            }
+          ],
+          "asr_output": "we are migrating from tensorflow to pytorch",
+          "formatted_output": "We are migrating from TensorFlow to Pytorch.",
+          "expected_memory_aware_output": "We are migrating from TensorFlow to PyTorch.",
+          "expected_decisions": [
+            {
+              "token": "Pytorch",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Pytorch' is a known variant of 'PyTorch'"
+            }
+          ]
+        }
+      ]
+    },
+
+    "C2_correct_abstentions": {
+      "description": "Cases where the system should NOT intervene. Abstaining is the correct behaviour.",
+      "cases": [
+        {
+          "id": "C2_01",
+          "name": "No memory exists — pass through unchanged",
+          "memory_state": [],
+          "asr_output": "send the report to priya by friday",
+          "formatted_output": "Send the report to Priya by Friday.",
+          "expected_memory_aware_output": "Send the report to Priya by Friday.",
+          "expected_decisions": [
+            {
+              "token": "Priya",
+              "decision": "PASS",
+              "reason": "No match found in memory"
+            }
+          ]
+        },
+        {
+          "id": "C2_02",
+          "name": "Phonetic match exists but token is not a known variant — abstain",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "call adithya for the update",
+          "formatted_output": "Call Adithya for the update.",
+          "expected_memory_aware_output": "Call Adithya for the update.",
+          "expected_decisions": [
+            {
+              "token": "Adithya",
+              "decision": "ABSTAIN",
+              "reason": "Phonetic match found for 'Aaditya' but 'Adithya' is not a known variant. Abstaining to avoid incorrect correction."
+            }
+          ],
+          "note": "This is the most important abstention case. Adithya could be a different person. Without an exact variant match we must not apply."
+        },
+        {
+          "id": "C2_03",
+          "name": "Memory suppressed — do not apply",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "suppressed",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "ask aditya to check the logs",
+          "formatted_output": "Ask Aditya to check the logs.",
+          "expected_memory_aware_output": "Ask Aditya to check the logs.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "ABSTAIN",
+              "reason": "Exact variant match found for 'Aaditya' but memory is suppressed. Abstaining."
+            }
+          ]
+        },
+        {
+          "id": "C2_04",
+          "name": "Token is canonical form itself — already correct, pass through",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "aaditya sent the file already",
+          "formatted_output": "Aaditya sent the file already.",
+          "expected_memory_aware_output": "Aaditya sent the file already.",
+          "expected_decisions": [
+            {
+              "token": "Aaditya",
+              "decision": "PASS",
+              "reason": "Token matches canonical form exactly — already correct, no intervention needed"
+            }
+          ]
+        },
+        {
+          "id": "C2_05",
+          "name": "Common English word that phonetically matches a memory — must not over-correct",
+          "memory_state": [
+            {
+              "canonical_form": "Kivi",
+              "category": "product_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Kiwi"]
+            }
+          ],
+          "asr_output": "i had a kiwi for breakfast",
+          "formatted_output": "I had a kiwi for breakfast.",
+          "expected_memory_aware_output": "I had a kiwi for breakfast.",
+          "expected_decisions": [
+            {
+              "token": "kiwi",
+              "decision": "ABSTAIN",
+              "reason": "Phonetic match found for 'Kivi' but 'kiwi' (lowercase) is not a registered variant. Abstaining."
+            }
+          ],
+          "note": "This case demonstrates why case-sensitive variant matching matters. The variant registered is 'Kiwi' (capitalised, indicating a proper noun context). 'kiwi' lowercase in a food context should not trigger correction. The system must store and match variants case-sensitively."
+        },
+        {
+          "id": "C2_06",
+          "name": "Memory in needs_review status due to conflict — do not apply",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "needs_review",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "aditya will present tomorrow",
+          "formatted_output": "Aditya will present tomorrow.",
+          "expected_memory_aware_output": "Aditya will present tomorrow.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "ABSTAIN",
+              "reason": "Memory for 'Aaditya' is flagged as needs_review due to a conflict. Abstaining until resolved."
+            }
+          ]
+        }
+      ]
+    },
+
+    "C3_learning_explicit": {
+      "description": "Cases that test the explicit input learning trigger.",
+      "cases": [
+        {
+          "id": "C3_01",
+          "name": "User explicitly adds a term — it is then applied",
+          "setup": "User calls POST /memory with canonical_form='Aaditya', category='person_name', variants=['Aditya']",
+          "memory_state_after_setup": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "remind aditya about the standup",
+          "formatted_output": "Remind Aditya about the standup.",
+          "expected_memory_aware_output": "Remind Aaditya about the standup.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+            }
+          ]
+        },
+        {
+          "id": "C3_02",
+          "name": "User explicitly adds a term — phonetic hash is stored correctly",
+          "setup": "User calls POST /memory with canonical_form='Sarvam', category='org_name', variants=['Saram']",
+          "verification": "GET /memory should return the entry with a non-null phonetic_hash field",
+          "expected_phonetic_hash_non_null": true
+        }
+      ]
+    },
+
+    "C4_learning_correction": {
+      "description": "Cases that test the manual correction learning trigger.",
+      "cases": [
+        {
+          "id": "C4_01",
+          "name": "User corrects transcript — memory created from diff",
+          "memory_state_before": [],
+          "correction_input": {
+            "original_formatted": "Ask Aditya to review the pull request.",
+            "corrected_text": "Ask Aaditya to review the pull request."
+          },
+          "expected_memory_state_after": [
+            {
+              "canonical_form": "Aaditya",
+              "evidence_source": "manual_correction",
+              "variants": ["Aditya"]
+            }
+          ],
+          "followup_transcript": {
+            "asr_output": "book a call with aditya",
+            "formatted_output": "Book a call with Aditya.",
+            "expected_memory_aware_output": "Book a call with Aaditya."
+          }
+        },
+        {
+          "id": "C4_02",
+          "name": "User corrects transcript — new variant added to existing memory",
+          "memory_state_before": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "correction_input": {
+            "original_formatted": "Ask Adithya to join the call.",
+            "corrected_text": "Ask Aaditya to join the call."
+          },
+          "expected_memory_state_after": [
+            {
+              "canonical_form": "Aaditya",
+              "variants": ["Aditya", "Adithya"]
+            }
+          ],
+          "note": "Adithya is a new bad form for the same person. It should be added as a variant, not create a new memory entry."
+        },
+        {
+          "id": "C4_03",
+          "name": "Correction with no change — no memory created",
+          "memory_state_before": [],
+          "correction_input": {
+            "original_formatted": "Send the file to Priya.",
+            "corrected_text": "Send the file to Priya."
+          },
+          "expected_memory_state_after": [],
+          "note": "If the correction is identical to the original, no diff exists and no memory should be created."
+        }
+      ]
+    },
+
+    "C5_conflict_handling": {
+      "description": "Cases where two memories have conflicting phonetic profiles.",
+      "cases": [
+        {
+          "id": "C5_01",
+          "name": "Two entries with same phonetic hash — conflict flagged",
+          "setup": "User adds 'Aditya' (person A) and 'Aaditya' (person B) as separate canonical forms, both with variant 'Aditya'",
+          "expected_behaviour": "System detects phonetic hash collision on write and sets status to needs_review on the newer entry. Does not silently overwrite.",
+          "expected_api_response": {
+            "status": "conflict",
+            "message": "Phonetic hash collision detected with existing entry. Entry created with status needs_review.",
+            "conflicting_entry_id": "existing entry id"
+          }
+        }
+      ]
+    },
+
+    "C6_user_control": {
+      "description": "Cases that test the user control and deletion endpoints.",
+      "cases": [
+        {
+          "id": "C6_01",
+          "name": "Delete a memory — hard delete with cascade",
+          "setup": "Memory for 'Aaditya' exists with variants and evidence log entries",
+          "action": "DELETE /memory/{id}",
+          "expected_behaviour": "Entry deleted from vocabulary_entries. All variants deleted from vocabulary_variants. All evidence log entries deleted from evidence_log. GET /memory returns empty list.",
+          "verification": "After deletion, processing a transcript containing 'Aditya' should produce PASS decision, not APPLY."
+        },
+        {
+          "id": "C6_02",
+          "name": "Suppress a memory — stops application without deleting",
+          "setup": "Memory for 'Aaditya' exists and is active",
+          "action": "PATCH /memory/{id} with status=suppressed",
+          "expected_behaviour": "Memory still exists in database. Processing transcript with 'Aditya' produces ABSTAIN decision with reason 'memory suppressed'.",
+          "verification": "GET /memory should still return the entry with status=suppressed."
+        },
+        {
+          "id": "C6_03",
+          "name": "Reset — all memory cleared for user",
+          "setup": "Multiple memory entries exist",
+          "action": "POST /memory/reset",
+          "expected_behaviour": "All entries, variants, and evidence logs deleted for the user. System behaves as if fresh for that user.",
+          "verification": "GET /memory returns empty list. Processing any transcript produces PASS decisions only."
+        }
+      ]
+    },
+
+    "C7_edge_cases": {
+      "description": "Edge cases and boundary conditions.",
+      "cases": [
+        {
+          "id": "C7_01",
+          "name": "Empty transcript",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "",
+          "formatted_output": "",
+          "expected_memory_aware_output": "",
+          "expected_decisions": []
+        },
+        {
+          "id": "C7_02",
+          "name": "All tokens match memories",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            },
+            {
+              "canonical_form": "Kivi",
+              "category": "product_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Kiwi"]
+            }
+          ],
+          "asr_output": "aditya uses kiwi",
+          "formatted_output": "Aditya uses Kiwi.",
+          "expected_memory_aware_output": "Aaditya uses Kivi.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+            },
+            {
+              "token": "Kiwi",
+              "decision": "APPLY",
+              "reason": "Exact variant match: 'Kiwi' is a known variant of 'Kivi'"
+            }
+          ]
+        },
+        {
+          "id": "C7_03",
+          "name": "Punctuation stripped correctly before matching",
+          "memory_state": [
+            {
+              "canonical_form": "Aaditya",
+              "category": "person_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Aditya"]
+            }
+          ],
+          "asr_output": "send it to aditya",
+          "formatted_output": "Send it to Aditya.",
+          "expected_memory_aware_output": "Send it to Aaditya.",
+          "expected_decisions": [
+            {
+              "token": "Aditya",
+              "decision": "APPLY",
+              "reason": "Exact variant match after punctuation stripping: 'Aditya' is a known variant of 'Aaditya'"
+            }
+          ],
+          "note": "The token 'Aditya.' (with trailing period) must be stripped to 'Aditya' before matching. The period must be reattached in the output."
+        },
+        {
+          "id": "C7_04",
+          "name": "Multi-word canonical form handling",
+          "memory_state": [
+            {
+              "canonical_form": "Sarvam AI",
+              "category": "org_name",
+              "status": "active",
+              "evidence_source": "explicit_input",
+              "variants": ["Saram AI", "Sarvam Ai"]
+            }
+          ],
+          "asr_output": "i work at sarvam ai",
+          "formatted_output": "I work at Sarvam Ai.",
+          "expected_memory_aware_output": "I work at Sarvam AI.",
+          "note": "Multi-word variants require the tokeniser to check adjacent token pairs, not just single tokens. This is a known complexity — if not implemented, document it as a known limitation."
+        }
+      ]
+    }
+  },
+
+  "evaluation_metrics": {
+    "primary": [
+      "Precision — of all interventions made, what fraction were correct?",
+      "Recall — of all interventions that should have been made, what fraction were made?",
+      "Abstention correctness — of all abstentions, what fraction were correct (i.e. intervention would have been wrong)?"
+    ],
+    "secondary": [
+      "Latency per transcript (ms)",
+      "Database query count per transcript",
+      "Evidence log completeness — does every decision have a logged reason?"
+    ],
+    "reported_separately": [
+      "Correct interventions",
+      "Incorrect interventions (false positives)",
+      "Correct abstentions",
+      "Incorrect abstentions (false negatives — memory existed but was not applied when it should have been)"
+    ]
+  }
+}

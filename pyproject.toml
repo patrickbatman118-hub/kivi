@@ -1,0 +1,15 @@
+[project]
+name = "kivi"
+version = "0.1.0"
+description = "Memory-aware transcription corrector"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.11.0",
+    "asyncpg>=0.28.0",
+    "fastapi[standard]>=0.100.0",
+    "google-genai>=0.2.0",
+    "phonetics>=1.0.5",
+    "pydantic-settings>=2.0.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+]

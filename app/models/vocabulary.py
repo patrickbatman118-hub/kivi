@@ -57,7 +57,9 @@ class VocabularyEntry(Base):
     evidence_source = Column(Enum(EvidenceSourceEnum), nullable=False)
     confidence = Column(Enum(ConfidenceEnum), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_seen_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    # Updated explicitly in app/services/pipeline.py on each APPLY — onupdate=func.now()
+    # would not fire here since updates go through the async ORM, not raw SQL.
+    last_seen_at = Column(DateTime(timezone=True), server_default=func.now())
     phonetic_hash = Column(String, nullable=True)
 
     user = relationship("User", back_populates="entries")

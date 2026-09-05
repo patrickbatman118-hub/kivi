@@ -72,12 +72,9 @@ async def process_transcript(
                 final_core_word = entry.canonical_form
                 entries_to_update.add(entry)
         elif match_type == "phonetic":
+            # Abstain regardless of the matched entry's status: the reason we don't
+            # apply is that the token isn't a known variant, not the entry's status.
             decision = "ABSTAIN"
-            if entry.status.value == "suppressed":
-                 # If it's a phonetic match but suppressed, should we log the phonetic match or just say suppressed?
-                 # C2_06 says "Memory for ... needs_review... Abstaining". 
-                 pass
-            
             reason = f"Phonetic match found for '{entry.canonical_form}' but '{core_word}' is not a known variant. Abstaining to avoid incorrect correction."
             if core_word.islower() and core_word.capitalize() == entry.canonical_form:
                 reason = f"Phonetic match found for '{entry.canonical_form}' but '{core_word}' (lowercase) is not a registered variant. Abstaining."

@@ -7,9 +7,6 @@ from app.models.vocabulary import CategoryEnum, StatusEnum, EvidenceSourceEnum, 
 class VocabularyVariantBase(BaseModel):
     variant_text: str
 
-class VocabularyVariantCreate(VocabularyVariantBase):
-    pass
-
 class VocabularyVariantResponse(VocabularyVariantBase):
     id: uuid.UUID
     source: VariantSourceEnum

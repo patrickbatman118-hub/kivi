@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -21,9 +19,17 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: kivi
     ports:
+      # Host port 5433, not 5432 — avoids colliding with a local Postgres already
+      # running on the host. The app always talks to the db service on 5432
+      # over the internal Docker network, so this only affects host-side psql access.
       - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d kivi"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  postgres_data:

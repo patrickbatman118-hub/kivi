@@ -1,0 +1,881 @@
+{
+  "summary": {
+    "total_cases": 25,
+    "scored_cases": 24,
+    "passed": 24,
+    "failed": 0,
+    "known_limitations": [
+      "C7_04"
+    ],
+    "precision": 1.0,
+    "recall": 1.0,
+    "abstention_correctness": 1.0
+  },
+  "results": [
+    {
+      "id": "C1_01",
+      "name": "Basic person name correction via exact variant match",
+      "input": {
+        "asr_output": "ask aditya to review the pull request",
+        "formatted_output": "Ask Aditya to review the pull request."
+      },
+      "expected_output": "Ask Aaditya to review the pull request.",
+      "actual_output": "Ask Aaditya to review the pull request.",
+      "actual_decisions": [
+        {
+          "token": "Ask",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Aditya",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "review",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "pull",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "request",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C1_02",
+      "name": "Product name correction \u2014 common misspelling",
+      "input": {
+        "asr_output": "open the kiwi app on my laptop",
+        "formatted_output": "Open the Kiwi app on my laptop."
+      },
+      "expected_output": "Open the Kivi app on my laptop.",
+      "actual_output": "Open the Kivi app on my laptop.",
+      "actual_decisions": [
+        {
+          "token": "Open",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Kiwi",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Kiwi' is a known variant of 'Kivi'"
+        },
+        {
+          "token": "app",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "on",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "my",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "laptop",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C1_03",
+      "name": "Acronym correction \u2014 lowercase to correct casing",
+      "input": {
+        "asr_output": "the nlp pipeline needs to be retrained",
+        "formatted_output": "The Nlp pipeline needs to be retrained."
+      },
+      "expected_output": "The NLP pipeline needs to be retrained.",
+      "actual_output": "The NLP pipeline needs to be retrained.",
+      "actual_decisions": [
+        {
+          "token": "The",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Nlp",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Nlp' is a known variant of 'NLP'"
+        },
+        {
+          "token": "pipeline",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "needs",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "be",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "retrained",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C1_04",
+      "name": "Multiple memories active \u2014 only the matched one applied",
+      "input": {
+        "asr_output": "aditya works at sarvam on the kivi project",
+        "formatted_output": "Aditya works at Sarvam on the Kivi project."
+      },
+      "expected_output": "Aaditya works at Sarvam on the Kivi project.",
+      "actual_output": "Aaditya works at Sarvam on the Kivi project.",
+      "actual_decisions": [
+        {
+          "token": "Aditya",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+        },
+        {
+          "token": "works",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "at",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Sarvam",
+          "decision": "PASS",
+          "reason": "Token matches canonical form exactly \u2014 already correct, no intervention needed"
+        },
+        {
+          "token": "on",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Kivi",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "project",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C1_05",
+      "name": "Correction-sourced memory applied on next transcript",
+      "input": {
+        "asr_output": "schedule a meeting with aditya tomorrow",
+        "formatted_output": "Schedule a meeting with Aditya tomorrow."
+      },
+      "expected_output": "Schedule a meeting with Aaditya tomorrow.",
+      "actual_output": "Schedule a meeting with Aaditya tomorrow.",
+      "actual_decisions": [
+        {
+          "token": "Schedule",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "a",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "meeting",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "with",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Aditya",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+        },
+        {
+          "token": "tomorrow",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C1_06",
+      "name": "Technical term with unusual casing",
+      "input": {
+        "asr_output": "we are migrating from tensorflow to pytorch",
+        "formatted_output": "We are migrating from TensorFlow to Pytorch."
+      },
+      "expected_output": "We are migrating from TensorFlow to PyTorch.",
+      "actual_output": "We are migrating from TensorFlow to PyTorch.",
+      "actual_decisions": [
+        {
+          "token": "We",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "are",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "migrating",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "from",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "TensorFlow",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Pytorch",
+          "decision": "APPLY",
+          "reason": "Exact variant match after punctuation stripping: 'Pytorch' is a known variant of 'PyTorch'"
+        }
+      ],
+      "passed": true,
+      "category": "C1_correct_interventions"
+    },
+    {
+      "id": "C2_01",
+      "name": "No memory exists \u2014 pass through unchanged",
+      "input": {
+        "asr_output": "send the report to priya by friday",
+        "formatted_output": "Send the report to Priya by Friday."
+      },
+      "expected_output": "Send the report to Priya by Friday.",
+      "actual_output": "Send the report to Priya by Friday.",
+      "actual_decisions": [
+        {
+          "token": "Send",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "report",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Priya",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "by",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Friday",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C2_02",
+      "name": "Phonetic match exists but token is not a known variant \u2014 abstain",
+      "input": {
+        "asr_output": "call adithya for the update",
+        "formatted_output": "Call Adithya for the update."
+      },
+      "expected_output": "Call Adithya for the update.",
+      "actual_output": "Call Adithya for the update.",
+      "actual_decisions": [
+        {
+          "token": "Call",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Adithya",
+          "decision": "ABSTAIN",
+          "reason": "Phonetic match found for 'Aaditya' but 'Adithya' is not a known variant. Abstaining to avoid incorrect correction."
+        },
+        {
+          "token": "for",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "update",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C2_03",
+      "name": "Memory suppressed \u2014 do not apply",
+      "input": {
+        "asr_output": "ask aditya to check the logs",
+        "formatted_output": "Ask Aditya to check the logs."
+      },
+      "expected_output": "Ask Aditya to check the logs.",
+      "actual_output": "Ask Aditya to check the logs.",
+      "actual_decisions": [
+        {
+          "token": "Ask",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Aditya",
+          "decision": "ABSTAIN",
+          "reason": "Exact variant match found for 'Aaditya' but memory is suppressed. Abstaining."
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "check",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "logs",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C2_04",
+      "name": "Token is canonical form itself \u2014 already correct, pass through",
+      "input": {
+        "asr_output": "aaditya sent the file already",
+        "formatted_output": "Aaditya sent the file already."
+      },
+      "expected_output": "Aaditya sent the file already.",
+      "actual_output": "Aaditya sent the file already.",
+      "actual_decisions": [
+        {
+          "token": "Aaditya",
+          "decision": "PASS",
+          "reason": "Token matches canonical form exactly \u2014 already correct, no intervention needed"
+        },
+        {
+          "token": "sent",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "the",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "file",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "already",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C2_05",
+      "name": "Common English word that phonetically matches a memory \u2014 must not over-correct",
+      "input": {
+        "asr_output": "i had a kiwi for breakfast",
+        "formatted_output": "I had a kiwi for breakfast."
+      },
+      "expected_output": "I had a kiwi for breakfast.",
+      "actual_output": "I had a kiwi for breakfast.",
+      "actual_decisions": [
+        {
+          "token": "I",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "had",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "a",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "kiwi",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "for",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "breakfast",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C2_06",
+      "name": "Memory in needs_review status due to conflict \u2014 do not apply",
+      "input": {
+        "asr_output": "aditya will present tomorrow",
+        "formatted_output": "Aditya will present tomorrow."
+      },
+      "expected_output": "Aditya will present tomorrow.",
+      "actual_output": "Aditya will present tomorrow.",
+      "actual_decisions": [
+        {
+          "token": "Aditya",
+          "decision": "ABSTAIN",
+          "reason": "Memory for 'Aaditya' is flagged as needs_review due to a conflict. Abstaining until resolved."
+        },
+        {
+          "token": "will",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "present",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "tomorrow",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": true,
+      "category": "C2_correct_abstentions"
+    },
+    {
+      "id": "C3_01",
+      "name": "User explicitly adds a term \u2014 it is then applied",
+      "passed": true,
+      "expected_output": "Remind Aaditya about the standup.",
+      "actual_output": "Remind Aaditya about the standup.",
+      "category": "C3_learning_explicit"
+    },
+    {
+      "id": "C3_02",
+      "name": "User explicitly adds a term \u2014 phonetic hash is stored correctly",
+      "passed": true,
+      "expected": "non-null phonetic_hash",
+      "actual": "SRFM",
+      "category": "C3_learning_explicit"
+    },
+    {
+      "id": "C4_01",
+      "name": "User corrects transcript \u2014 memory created from diff",
+      "passed": true,
+      "correction_input": {
+        "original_formatted": "Ask Aditya to review the pull request.",
+        "corrected_text": "Ask Aaditya to review the pull request."
+      },
+      "expected_memory_state_after": [
+        {
+          "canonical_form": "Aaditya",
+          "evidence_source": "manual_correction",
+          "variants": [
+            "Aditya"
+          ]
+        }
+      ],
+      "actual_memory_state": [
+        {
+          "id": "71283600-406e-4623-bf3d-9066a500be1c",
+          "canonical_form": "Aaditya",
+          "category": "custom_spelling",
+          "status": "active",
+          "evidence_source": "manual_correction",
+          "confidence": "high",
+          "phonetic_hash": "ATT",
+          "created_at": "2026-09-05T11:23:25.976581Z",
+          "last_seen_at": "2026-09-05T11:23:25.976581Z",
+          "variants": [
+            {
+              "variant_text": "Aditya",
+              "id": "b7bce3ad-09e6-4ec3-a620-cfeedb3c0b0d",
+              "source": "user_provided",
+              "created_at": "2026-09-05T11:23:25.976581Z"
+            }
+          ]
+        }
+      ],
+      "followup": {
+        "expected_output": "Book a call with Aaditya.",
+        "actual_output": "Book a call with Aaditya."
+      },
+      "category": "C4_learning_correction"
+    },
+    {
+      "id": "C4_02",
+      "name": "User corrects transcript \u2014 new variant added to existing memory",
+      "passed": true,
+      "correction_input": {
+        "original_formatted": "Ask Adithya to join the call.",
+        "corrected_text": "Ask Aaditya to join the call."
+      },
+      "expected_memory_state_after": [
+        {
+          "canonical_form": "Aaditya",
+          "variants": [
+            "Aditya",
+            "Adithya"
+          ]
+        }
+      ],
+      "actual_memory_state": [
+        {
+          "id": "421171e1-f347-4467-936c-959f9de25ade",
+          "canonical_form": "Aaditya",
+          "category": "person_name",
+          "status": "active",
+          "evidence_source": "explicit_input",
+          "confidence": "high",
+          "phonetic_hash": "ATT",
+          "created_at": "2026-09-05T11:23:26.013999Z",
+          "last_seen_at": "2026-09-05T11:23:26.013999Z",
+          "variants": [
+            {
+              "variant_text": "Aditya",
+              "id": "f72587eb-cd31-4434-8e31-3b83fe81907e",
+              "source": "user_provided",
+              "created_at": "2026-09-05T11:23:26.013999Z"
+            },
+            {
+              "variant_text": "Adithya",
+              "id": "35e00c2e-8cf4-4b24-810d-ca574e0e0af7",
+              "source": "user_provided",
+              "created_at": "2026-09-05T11:23:26.023875Z"
+            }
+          ]
+        }
+      ],
+      "category": "C4_learning_correction"
+    },
+    {
+      "id": "C4_03",
+      "name": "Correction with no change \u2014 no memory created",
+      "passed": true,
+      "correction_input": {
+        "original_formatted": "Send the file to Priya.",
+        "corrected_text": "Send the file to Priya."
+      },
+      "actual_correction_response": [],
+      "category": "C4_learning_correction"
+    },
+    {
+      "id": "C5_01",
+      "name": "Two entries with same phonetic hash \u2014 conflict flagged",
+      "passed": true,
+      "expected_status_code": 409,
+      "actual_status_code": 409,
+      "actual_response": {
+        "status": "conflict",
+        "message": "Phonetic hash collision detected with existing entry. Entry created with status needs_review.",
+        "conflicting_entry_id": "17905d97-9e56-499c-8b47-066bee6718d3",
+        "entry": {
+          "id": "2b5a884f-3ce6-4522-93eb-fbbadc9f3b2a",
+          "canonical_form": "Aaditya",
+          "status": "needs_review"
+        }
+      },
+      "category": "C5_conflict_handling"
+    },
+    {
+      "id": "C6_01",
+      "name": "Delete a memory \u2014 hard delete with cascade",
+      "passed": true,
+      "actual_memory_after_delete": [],
+      "actual_process_after_delete": {
+        "memory_aware_output": "Ask Aditya.",
+        "intervention_log": [
+          {
+            "token": "Ask",
+            "decision": "PASS",
+            "reason": "No match found in memory"
+          },
+          {
+            "token": "Aditya",
+            "decision": "PASS",
+            "reason": "No match found in memory"
+          }
+        ]
+      },
+      "category": "C6_user_control"
+    },
+    {
+      "id": "C6_02",
+      "name": "Suppress a memory \u2014 stops application without deleting",
+      "passed": true,
+      "actual_memory": [
+        {
+          "id": "b97997bb-6e1a-4691-86f4-f9728c7d36f6",
+          "canonical_form": "Aaditya",
+          "category": "person_name",
+          "status": "suppressed",
+          "evidence_source": "explicit_input",
+          "confidence": "high",
+          "phonetic_hash": "ATT",
+          "created_at": "2026-09-05T11:23:26.071191Z",
+          "last_seen_at": "2026-09-05T11:23:26.071191Z",
+          "variants": [
+            {
+              "variant_text": "Aditya",
+              "id": "d1946363-c95d-40cb-abe4-d17f5684842a",
+              "source": "user_provided",
+              "created_at": "2026-09-05T11:23:26.071191Z"
+            }
+          ]
+        }
+      ],
+      "actual_process": {
+        "memory_aware_output": "Ask Aditya.",
+        "intervention_log": [
+          {
+            "token": "Ask",
+            "decision": "PASS",
+            "reason": "No match found in memory"
+          },
+          {
+            "token": "Aditya",
+            "decision": "ABSTAIN",
+            "reason": "Exact variant match found for 'Aaditya' but memory is suppressed. Abstaining."
+          }
+        ]
+      },
+      "category": "C6_user_control"
+    },
+    {
+      "id": "C6_03",
+      "name": "Reset \u2014 all memory cleared for user",
+      "passed": true,
+      "actual_memory": [],
+      "category": "C6_user_control"
+    },
+    {
+      "id": "C7_01",
+      "name": "Empty transcript",
+      "input": {
+        "asr_output": "",
+        "formatted_output": ""
+      },
+      "expected_output": "",
+      "actual_output": "",
+      "actual_decisions": [],
+      "passed": true,
+      "category": "C7_edge_cases"
+    },
+    {
+      "id": "C7_02",
+      "name": "All tokens match memories",
+      "input": {
+        "asr_output": "aditya uses kiwi",
+        "formatted_output": "Aditya uses Kiwi."
+      },
+      "expected_output": "Aaditya uses Kivi.",
+      "actual_output": "Aaditya uses Kivi.",
+      "actual_decisions": [
+        {
+          "token": "Aditya",
+          "decision": "APPLY",
+          "reason": "Exact variant match: 'Aditya' is a known variant of 'Aaditya'"
+        },
+        {
+          "token": "uses",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Kiwi",
+          "decision": "APPLY",
+          "reason": "Exact variant match after punctuation stripping: 'Kiwi' is a known variant of 'Kivi'"
+        }
+      ],
+      "passed": true,
+      "category": "C7_edge_cases"
+    },
+    {
+      "id": "C7_03",
+      "name": "Punctuation stripped correctly before matching",
+      "input": {
+        "asr_output": "send it to aditya",
+        "formatted_output": "Send it to Aditya."
+      },
+      "expected_output": "Send it to Aaditya.",
+      "actual_output": "Send it to Aaditya.",
+      "actual_decisions": [
+        {
+          "token": "Send",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "it",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "to",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Aditya",
+          "decision": "APPLY",
+          "reason": "Exact variant match after punctuation stripping: 'Aditya' is a known variant of 'Aaditya'"
+        }
+      ],
+      "passed": true,
+      "category": "C7_edge_cases"
+    },
+    {
+      "id": "C7_04",
+      "name": "Multi-word canonical form handling",
+      "input": {
+        "asr_output": "i work at sarvam ai",
+        "formatted_output": "I work at Sarvam Ai."
+      },
+      "expected_output": "I work at Sarvam AI.",
+      "actual_output": "I work at Sarvam Ai.",
+      "actual_decisions": [
+        {
+          "token": "I",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "work",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "at",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        },
+        {
+          "token": "Sarvam",
+          "decision": "ABSTAIN",
+          "reason": "Phonetic match found for 'Sarvam AI' but 'Sarvam' is not a known variant. Abstaining to avoid incorrect correction."
+        },
+        {
+          "token": "Ai",
+          "decision": "PASS",
+          "reason": "No match found in memory"
+        }
+      ],
+      "passed": null,
+      "known_limitation": true,
+      "category": "C7_edge_cases"
+    }
+  ]
+}

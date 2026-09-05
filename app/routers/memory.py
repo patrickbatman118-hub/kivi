@@ -1,6 +1,7 @@
 import uuid
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -97,7 +98,6 @@ async def add_memory(
     res = await db.execute(stmt)
     
     if entry_status == StatusEnum.needs_review:
-        from fastapi.responses import JSONResponse
         return JSONResponse(
             status_code=409,
             content={

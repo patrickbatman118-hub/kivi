@@ -26,12 +26,8 @@ def retrieve_memory_for_token(
     if not token:
         return None, "none"
 
-    token_lower = token.lower()
-    
-    # Stage 1: Exact variant match (case-sensitive as per C2_05 notes: 'kiwi' lowercase should not trigger 'Kiwi')
-    # Wait, the spec for C2_05 says: "The variant registered is 'Kiwi' (capitalised). 'kiwi' lowercase should not trigger."
-    # So variant matching is CASE-SENSITIVE for exact variant match.
-    # What about canonical form matching? The spec says "token exactly matches a known variant".
+    # Stage 1: exact match, case-sensitive (a lowercase 'kiwi' must not match a
+    # registered variant 'Kiwi' — see C2_05 in evaluation/cases.json).
     for entry in user_memories:
         if entry.canonical_form == token:
              return entry, "canonical"

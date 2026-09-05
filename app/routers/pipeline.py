@@ -1,27 +1,13 @@
 import uuid
-from typing import List, Dict, Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 
 from app.database import get_db
 from app.dependencies import get_current_user_id
 from app.services.pipeline import process_transcript
+from app.schemas.pipeline import ProcessRequest, ProcessResponse
 
 router = APIRouter(prefix="/process", tags=["pipeline"])
-
-class ProcessRequest(BaseModel):
-    asr_output: str
-    formatted_output: str
-
-class DecisionLog(BaseModel):
-    token: str
-    decision: str
-    reason: str
-
-class ProcessResponse(BaseModel):
-    memory_aware_output: str
-    intervention_log: List[DecisionLog]
 
 @router.post("", response_model=ProcessResponse)
 async def process_endpoint(

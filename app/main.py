@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from app.routers import memory, pipeline, correction
 
 app = FastAPI(
@@ -14,3 +15,7 @@ app.include_router(correction.router)
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+@app.get("/")
+async def index():
+    return FileResponse("app/static/index.html")

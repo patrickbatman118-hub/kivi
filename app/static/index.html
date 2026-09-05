@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kivi — Memory Dashboard</title>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    color: #1a1a1a;
+    background: #fff;
+  }
+  h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.05rem; margin-top: 2.5rem; border-bottom: 1px solid #ccc; padding-bottom: 0.3rem; }
+  .subtitle { color: #666; margin-top: 0; margin-bottom: 1.5rem; font-size: 0.9rem; }
+  section { margin-bottom: 1rem; }
+  label { display: block; font-size: 0.85rem; font-weight: 600; margin-top: 0.6rem; }
+  input[type=text], textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.4rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    margin-top: 0.2rem;
+    border: 1px solid #999;
+    border-radius: 3px;
+  }
+  textarea { min-height: 3.5rem; resize: vertical; }
+  button {
+    margin-top: 0.8rem;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid #333;
+    background: #f0f0f0;
+    border-radius: 3px;
+  }
+  button:hover { background: #e0e0e0; }
+  button.danger { border-color: #a00; color: #a00; }
+  button.danger:hover { background: #fdecec; }
+  table { border-collapse: collapse; width: 100%; margin-top: 0.6rem; font-size: 0.85rem; }
+  th, td { border: 1px solid #ccc; padding: 0.4rem 0.5rem; text-align: left; vertical-align: top; }
+  th { background: #f5f5f5; }
+  .status-active { color: #0a6b0a; }
+  .status-suppressed { color: #999; }
+  .status-needs_review { color: #b8860b; }
+  .decision-APPLY { color: #0a6b0a; font-weight: 600; }
+  .decision-ABSTAIN { color: #b8860b; font-weight: 600; }
+  .decision-PASS { color: #666; }
+  .output-box {
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 0.6rem;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+  }
+  .msg { font-size: 0.85rem; margin-top: 0.4rem; }
+  .msg.error { color: #a00; }
+  .msg.ok { color: #0a6b0a; }
+  .row-actions button { margin-top: 0; margin-right: 0.3rem; padding: 0.2rem 0.5rem; font-size: 0.8rem; }
+  .inline-form { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .inline-form > div { flex: 1; min-width: 200px; }
+  code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<h1>Kivi — Memory Dashboard</h1>
+<p class="subtitle">Internal reviewer tool. No auth, single demo user.</p>
+
+<section>
+  <h2>1. Add a memory term</h2>
+  <div class="inline-form">
+    <div>
+      <label>Canonical form</label>
+      <input type="text" id="add-canonical" placeholder="e.g. Aaditya">
+    </div>
+    <div>
+      <label>Category</label>
+      <select id="add-category">
+        <option value="person_name">person_name</option>
+        <option value="org_name">org_name</option>
+        <option value="project_name">project_name</option>
+        <option value="product_name">product_name</option>
+        <option value="technical_term">technical_term</option>
+        <option value="acronym">acronym</option>
+        <option value="custom_spelling">custom_spelling</option>
+      </select>
+    </div>
+  </div>
+  <label>Known bad variants (comma separated)</label>
+  <input type="text" id="add-variants" placeholder="e.g. Aditya, aditya">
+  <button id="add-btn">Add term</button>
+  <div id="add-msg" class="msg"></div>
+</section>
+
+<section>
+  <h2>2. Current memory state</h2>
+  <button id="refresh-btn">Refresh</button>
+  <table id="memory-table">
+    <thead>
+      <tr>
+        <th>Canonical</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Evidence source</th>
+        <th>Variants</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="memory-msg" class="msg"></div>
+</section>
+
+<section>
+  <h2>3. Process a transcript</h2>
+  <label>ASR output</label>
+  <textarea id="proc-asr" placeholder="ask aditya to review the pull request"></textarea>
+  <label>Formatted output</label>
+  <textarea id="proc-formatted" placeholder="Ask Aditya to review the pull request."></textarea>
+  <button id="proc-btn">Process</button>
+  <div id="proc-msg" class="msg"></div>
+  <div id="proc-output" class="output-box" style="display:none"></div>
+  <table id="proc-log" style="display:none">
+    <thead><tr><th>Token</th><th>Decision</th><th>Reason</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>4. Submit a correction</h2>
+  <label>Original formatted output</label>
+  <textarea id="corr-original" placeholder="Ask Aditya to review the pull request."></textarea>
+  <label>Corrected text</label>
+  <textarea id="corr-corrected" placeholder="Ask Aaditya to review the pull request."></textarea>
+  <button id="corr-btn">Submit correction</button>
+  <div id="corr-msg" class="msg"></div>
+  <table id="corr-result" style="display:none">
+    <thead><tr><th>Canonical</th><th>Category</th><th>Evidence source</th><th>Variants</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>5. Reset</h2>
+  <p class="subtitle">Deletes all memory entries, variants, and evidence log rows for this user.</p>
+  <button id="reset-btn" class="danger">Reset all memory</button>
+  <div id="reset-msg" class="msg"></div>
+</section>
+
+<script>
+const API = "";
+
+async function api(method, path, body) {
+  const opts = { method, headers: {} };
+  if (body !== undefined) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(API + path, opts);
+  let data = null;
+  const text = await res.text();
+  if (text) {
+    try { data = JSON.parse(text); } catch (e) { data = text; }
+  }
+  return { status: res.status, data };
+}
+
+function setMsg(el, text, ok) {
+  el.textContent = text;
+  el.className = "msg " + (ok ? "ok" : "error");
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+async function loadMemory() {
+  const { status, data } = await api("GET", "/memory");
+  const tbody = document.querySelector("#memory-table tbody");
+  tbody.innerHTML = "";
+  if (status !== 200) {
+    setMsg(document.getElementById("memory-msg"), "Failed to load memory.", false);
+    return;
+  }
+  for (const entry of data) {
+    const tr = document.createElement("tr");
+    const variants = entry.variants.map(v => escapeHtml(v.variant_text)).join(", ");
+    tr.innerHTML = `
+      <td>${escapeHtml(entry.canonical_form)}</td>
+      <td>${escapeHtml(entry.category)}</td>
+      <td class="status-${entry.status}">${escapeHtml(entry.status)}</td>
+      <td>${escapeHtml(entry.evidence_source)}</td>
+      <td>${variants}</td>
+      <td class="row-actions"></td>
+    `;
+    const actionsTd = tr.querySelector(".row-actions");
+
+    if (entry.status !== "suppressed") {
+      const suppressBtn = document.createElement("button");
+      suppressBtn.textContent = "Suppress";
+      suppressBtn.onclick = () => updateStatus(entry.id, "suppressed");
+      actionsTd.appendChild(suppressBtn);
+    } else {
+      const reactivateBtn = document.createElement("button");
+      reactivateBtn.textContent = "Reactivate";
+      reactivateBtn.onclick = () => updateStatus(entry.id, "active");
+      actionsTd.appendChild(reactivateBtn);
+    }
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.className = "danger";
+    deleteBtn.onclick = () => deleteEntry(entry.id);
+    actionsTd.appendChild(deleteBtn);
+
+    tbody.appendChild(tr);
+  }
+  setMsg(document.getElementById("memory-msg"), `${data.length} entr${data.length === 1 ? "y" : "ies"} loaded.`, true);
+}
+
+async function updateStatus(id, status) {
+  const { status: code } = await api("PATCH", `/memory/${id}`, { status });
+  if (code === 200) {
+    loadMemory();
+  } else {
+    setMsg(document.getElementById("memory-msg"), "Failed to update status.", false);
+  }
+}
+
+async function deleteEntry(id) {
+  if (!confirm("Delete this memory entry and all its variants/evidence? This cannot be undone.")) return;
+  const { status } = await api("DELETE", `/memory/${id}`);
+  if (status === 204) {
+    loadMemory();
+  } else {
+    setMsg(document.getElementById("memory-msg"), "Failed to delete entry.", false);
+  }
+}
+
+document.getElementById("add-btn").onclick = async () => {
+  const canonical_form = document.getElementById("add-canonical").value.trim();
+  const category = document.getElementById("add-category").value;
+  const variantsRaw = document.getElementById("add-variants").value.trim();
+  const variants = variantsRaw ? variantsRaw.split(",").map(v => v.trim()).filter(Boolean) : [];
+  const msgEl = document.getElementById("add-msg");
+
+  if (!canonical_form) {
+    setMsg(msgEl, "Canonical form is required.", false);
+    return;
+  }
+
+  const { status, data } = await api("POST", "/memory", { canonical_form, category, variants });
+
+  if (status === 200) {
+    setMsg(msgEl, `Added "${canonical_form}".`, true);
+    document.getElementById("add-canonical").value = "";
+    document.getElementById("add-variants").value = "";
+    loadMemory();
+  } else if (status === 409) {
+    setMsg(msgEl, `Conflict: ${data.message}`, false);
+    loadMemory();
+  } else {
+    setMsg(msgEl, "Failed to add term.", false);
+  }
+};
+
+document.getElementById("refresh-btn").onclick = loadMemory;
+
+document.getElementById("proc-btn").onclick = async () => {
+  const asr_output = document.getElementById("proc-asr").value;
+  const formatted_output = document.getElementById("proc-formatted").value;
+  const msgEl = document.getElementById("proc-msg");
+  const outputBox = document.getElementById("proc-output");
+  const logTable = document.getElementById("proc-log");
+  const logBody = logTable.querySelector("tbody");
+
+  const { status, data } = await api("POST", "/process", { asr_output, formatted_output });
+
+  if (status !== 200) {
+    setMsg(msgEl, "Failed to process transcript.", false);
+    outputBox.style.display = "none";
+    logTable.style.display = "none";
+    return;
+  }
+
+  setMsg(msgEl, "Processed.", true);
+  outputBox.style.display = "block";
+  outputBox.textContent = data.memory_aware_output || "(empty)";
+
+  logBody.innerHTML = "";
+  for (const d of data.intervention_log) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(d.token)}</td>
+      <td class="decision-${d.decision}">${escapeHtml(d.decision)}</td>
+      <td>${escapeHtml(d.reason)}</td>
+    `;
+    logBody.appendChild(tr);
+  }
+  logTable.style.display = data.intervention_log.length ? "table" : "none";
+};
+
+document.getElementById("corr-btn").onclick = async () => {
+  const original_formatted = document.getElementById("corr-original").value;
+  const corrected_text = document.getElementById("corr-corrected").value;
+  const msgEl = document.getElementById("corr-msg");
+  const resultTable = document.getElementById("corr-result");
+  const resultBody = resultTable.querySelector("tbody");
+
+  const { status, data } = await api("POST", "/correct", { original_formatted, corrected_text });
+
+  if (status !== 200) {
+    setMsg(msgEl, "Failed to submit correction.", false);
+    resultTable.style.display = "none";
+    return;
+  }
+
+  if (!data.length) {
+    setMsg(msgEl, "No changes detected — no memory created or updated.", true);
+    resultTable.style.display = "none";
+    return;
+  }
+
+  setMsg(msgEl, `${data.length} memory entr${data.length === 1 ? "y" : "ies"} created/updated.`, true);
+  resultBody.innerHTML = "";
+  for (const entry of data) {
+    const variants = entry.variants.map(v => escapeHtml(v.variant_text)).join(", ");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(entry.canonical_form)}</td>
+      <td>${escapeHtml(entry.category)}</td>
+      <td>${escapeHtml(entry.evidence_source)}</td>
+      <td>${variants}</td>
+    `;
+    resultBody.appendChild(tr);
+  }
+  resultTable.style.display = "table";
+  loadMemory();
+};
+
+document.getElementById("reset-btn").onclick = async () => {
+  if (!confirm("Reset ALL memory for this user? This deletes every entry, variant, and evidence log row. This cannot be undone.")) return;
+  const { status } = await api("POST", "/memory/reset");
+  const msgEl = document.getElementById("reset-msg");
+  if (status === 204) {
+    setMsg(msgEl, "All memory reset.", true);
+    loadMemory();
+  } else {
+    setMsg(msgEl, "Failed to reset memory.", false);
+  }
+};
+
+loadMemory();
+</script>
+</body>
+</html>

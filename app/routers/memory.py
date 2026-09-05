@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.database import get_db
-from app.config import settings
+from app.dependencies import get_current_user_id
 from app.models.vocabulary import (
     User,
     VocabularyEntry,
@@ -22,9 +22,6 @@ from app.schemas.vocabulary import MemoryCreate, MemoryResponse, MemoryStatusUpd
 from app.services.phonetic import get_phonetic_hash
 
 router = APIRouter(prefix="/memory", tags=["memory"])
-
-async def get_current_user_id() -> uuid.UUID:
-    return uuid.UUID(settings.user_id)
 
 @router.get("", response_model=List[MemoryResponse])
 async def list_memories(

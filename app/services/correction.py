@@ -116,10 +116,7 @@ async def apply_learning(
             source=VariantSourceEnum.user_provided
         )
         db.add(new_variant)
-        
-        # Have to wait to avoid DetachedInstanceError or similar, but adding to session is fine.
-        entry.variants = [new_variant]
-        
+
     evidence = EvidenceLog(
         entry_id=entry.id,
         trigger_type=TriggerTypeEnum.manual_correction,

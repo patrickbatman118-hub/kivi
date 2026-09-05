@@ -6,6 +6,8 @@ import os
 # Add the parent directory to sys.path so we can import from app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from sqlalchemy import select
+
 from app.database import AsyncSessionLocal
 from app.models.vocabulary import (
     User,
@@ -17,6 +19,7 @@ from app.models.vocabulary import (
     ConfidenceEnum,
     VariantSourceEnum,
 )
+from app.services.phonetic import get_phonetic_hash
 
 # Use the default user_id from .env.example
 DEFAULT_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000000")
@@ -34,47 +37,56 @@ async def seed_data():
             print(f"User with ID {DEFAULT_USER_ID} already exists")
 
         # Seed memory entry 1: Aaditya -> Aditya
-        entry1 = VocabularyEntry(
+        await seed_entry(
+            session,
             user_id=user.id,
             canonical_form="Aaditya",
             category=CategoryEnum.person_name,
-            status=StatusEnum.active,
-            evidence_source=EvidenceSourceEnum.explicit_input,
-            confidence=ConfidenceEnum.high,
-            phonetic_hash="ATJT" # Double metaphone for Aaditya/Aditya
-        )
-        session.add(entry1)
-        await session.flush() # flush to get entry1.id
-
-        variant1 = VocabularyVariant(
-            entry_id=entry1.id,
             variant_text="Aditya",
-            source=VariantSourceEnum.user_provided
         )
-        session.add(variant1)
 
         # Seed memory entry 2: Kivi -> Kiwi
-        entry2 = VocabularyEntry(
+        await seed_entry(
+            session,
             user_id=user.id,
             canonical_form="Kivi",
             category=CategoryEnum.product_name,
-            status=StatusEnum.active,
-            evidence_source=EvidenceSourceEnum.explicit_input,
-            confidence=ConfidenceEnum.high,
-            phonetic_hash="KF" # Double metaphone for Kivi
-        )
-        session.add(entry2)
-        await session.flush()
-
-        variant2 = VocabularyVariant(
-            entry_id=entry2.id,
             variant_text="Kiwi",
-            source=VariantSourceEnum.user_provided
         )
-        session.add(variant2)
 
-        await session.commit()
         print("Seed data inserted successfully.")
+
+
+async def seed_entry(session, user_id, canonical_form, category, variant_text):
+    existing = await session.scalar(
+        select(VocabularyEntry).where(
+            VocabularyEntry.user_id == user_id,
+            VocabularyEntry.canonical_form == canonical_form,
+        )
+    )
+    if existing:
+        print(f"Entry for '{canonical_form}' already exists, skipping.")
+        return
+
+    entry = VocabularyEntry(
+        user_id=user_id,
+        canonical_form=canonical_form,
+        category=category,
+        status=StatusEnum.active,
+        evidence_source=EvidenceSourceEnum.explicit_input,
+        confidence=ConfidenceEnum.high,
+        phonetic_hash=get_phonetic_hash(canonical_form),
+    )
+    session.add(entry)
+    await session.flush()  # flush to get entry.id
+
+    variant = VocabularyVariant(
+        entry_id=entry.id,
+        variant_text=variant_text,
+        source=VariantSourceEnum.user_provided,
+    )
+    session.add(variant)
+    await session.commit()
 
 if __name__ == "__main__":
     asyncio.run(seed_data())

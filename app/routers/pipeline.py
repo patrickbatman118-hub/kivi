@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 from app.database import get_db
-from app.routers.memory import get_current_user_id
+from app.dependencies import get_current_user_id
 from app.services.pipeline import process_transcript
 
 router = APIRouter(prefix="/process", tags=["pipeline"])

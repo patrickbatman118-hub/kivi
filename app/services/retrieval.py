@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.models.vocabulary import VocabularyEntry, StatusEnum
-from app.services.phonetic import get_phonetic_hash
+from app.services.phonetic import get_phonetic_hashes
 
 async def load_user_memory(db: AsyncSession, user_id: uuid.UUID) -> List[VocabularyEntry]:
     """Loads all memories for a user."""
@@ -41,10 +41,13 @@ def retrieve_memory_for_token(
                 return entry, "exact_variant"
 
     # Stage 2: Phonetic hash match
-    p_hash = get_phonetic_hash(token)
-    if p_hash:
+    # Check both Double Metaphone codes of the incoming token against each
+    # entry's stored primary code (only the primary code is stored on write).
+    primary, secondary = get_phonetic_hashes(token)
+    token_codes = {c for c in (primary, secondary) if c}
+    if token_codes:
         for entry in user_memories:
-            if entry.phonetic_hash == p_hash:
+            if entry.phonetic_hash and entry.phonetic_hash in token_codes:
                 return entry, "phonetic"
 
     return None, "none"

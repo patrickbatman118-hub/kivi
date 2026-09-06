@@ -11,8 +11,7 @@ venv/
 *.sqlite3
 .DS_Store
 
-# Session history and evaluation docs (internal use only)
-SESSION_CONTEXT.md
-EVALUATION.md
-README_CONTEXT.md
-
+# Ignore all markdown files except README.md and RUN.md
+*.md
+!README.md
+!RUN.md

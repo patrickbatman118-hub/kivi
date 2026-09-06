@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class ProcessRequest(BaseModel):
     asr_output: str
-    formatted_output: str
+    formatted_output: Optional[str] = None
 
 class DecisionLog(BaseModel):
     token: str

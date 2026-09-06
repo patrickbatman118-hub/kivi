@@ -1,10 +1,11 @@
 import re
 import uuid
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
 
 from app.services.retrieval import load_user_memory, retrieve_memory_for_token
+from app.services.gemini import generate_formatted_output
 from app.models.vocabulary import VocabularyEntry
 
 def strip_punctuation(token: str) -> Tuple[str, str, str]:
@@ -18,12 +19,15 @@ def strip_punctuation(token: str) -> Tuple[str, str, str]:
     return "", token, ""
 
 async def process_transcript(
-    db: AsyncSession, 
-    user_id: uuid.UUID, 
-    asr_output: str, 
-    formatted_output: str
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    asr_output: str,
+    formatted_output: Optional[str] = None
 ) -> Tuple[str, List[Dict[str, Any]]]:
-    
+
+    if formatted_output is None:
+        formatted_output = await generate_formatted_output(asr_output)
+
     if not formatted_output.strip():
         return "", []
 

@@ -14,3 +14,5 @@ venv/
 # Session history and evaluation docs (internal use only)
 SESSION_CONTEXT.md
 EVALUATION.md
+README_CONTEXT.md
+

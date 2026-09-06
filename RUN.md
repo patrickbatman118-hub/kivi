@@ -1,3 +1,5 @@
+Primary review method: containerised application (Docker)
+
 # Running Kivi
 
 Exact steps to get the system running, seeded, exercised, evaluated, and reset.
@@ -18,7 +20,7 @@ cp .env.example .env
 | Variable | Meaning |
 |---|---|
 | `DB_URL` | Async SQLAlchemy connection string. Default (`postgresql+asyncpg://postgres:postgres@db:5432/kivi`) points at the `db` service in `docker-compose.yml` — leave as-is unless you change the compose file. |
-| `GEMINI_API_KEY` | Google Gemini API key, used only for the upstream ASR → formatted-text cleanup step. Kivi's own memory/retrieval/abstention logic never calls it, so a placeholder value is fine for exercising this repo's endpoints directly. |
+| `GEMINI_API_KEY` | Required. Google Gemini API key used to generate formatted output from raw ASR input in the live demo. The evaluation script (run_eval.py) does not call Gemini — it provides formatted output directly and is safe to run without a valid key. But the UI and POST /process endpoint require a real key to function. |
 | `USER_ID` | UUID used as the single demo user across every endpoint (no auth layer). Default `00000000-0000-0000-0000-000000000000` matches the seed script. |
 
 `.env` is git-ignored — never commit it.
@@ -64,6 +66,8 @@ http://localhost:8000/
 
 ## 7. Primary interactions to try
 
+Note: The 'Process' button calls the Gemini API to generate formatted output when only ASR input is provided. If you see a 503 UNAVAILABLE error, this is a temporary Google API capacity issue and not a system failure. Wait 30 seconds and try again. Alternatively, provide both ASR output AND formatted output manually — in this case Gemini is not called and the memory pipeline runs directly.
+
 - **Add a term** — fill in canonical form, category, and comma-separated bad variants, click "Add term". It appears in the memory table below.
 - **Process a transcript** — paste an ASR output and a formatted output containing one of the seeded bad variants (e.g. formatted output `Ask Aditya to review the pull request.`). Click "Process" to see the memory-aware output and the full per-token decision log (APPLY / ABSTAIN / PASS with a reason each).
 - **Submit a correction** — paste an original formatted transcript and your corrected version of it (e.g. original `Ask Adithya to join the call.`, corrected `Ask Aaditya to join the call.`). Click "Submit correction" to see what memory was created or updated, then re-run "Process" on a sentence with that bad form to see it now applies.
@@ -77,6 +81,8 @@ docker compose exec app uv run python evaluation/run_eval.py
 ```
 
 This drives every case in `evaluation/cases.json` against the running API, prints a summary (pass/fail count, precision, recall, abstention correctness), and exits non-zero if any case fails. It resets memory before each case and again when it finishes, so it's safe to run repeatedly.
+
+The evaluation script does not call the Gemini API. It provides formatted output directly for all cases, ensuring reproducible results regardless of model availability or rate limits.
 
 ## 9. Where results are written
 

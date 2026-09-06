@@ -121,7 +121,7 @@
   <h2>3. Process a transcript</h2>
   <label>ASR output</label>
   <textarea id="proc-asr" placeholder="ask aditya to review the pull request"></textarea>
-  <label>Formatted output</label>
+  <label>Formatted output (optional — leave blank to auto-generate via Gemini)</label>
   <textarea id="proc-formatted" placeholder="Ask Aditya to review the pull request."></textarea>
   <button id="proc-btn">Process</button>
   <div id="proc-msg" class="msg"></div>
@@ -281,31 +281,52 @@ document.getElementById("proc-btn").onclick = async () => {
   const outputBox = document.getElementById("proc-output");
   const logTable = document.getElementById("proc-log");
   const logBody = logTable.querySelector("tbody");
+  const procBtn = document.getElementById("proc-btn");
 
-  const { status, data } = await api("POST", "/process", { asr_output, formatted_output });
+  const originalLabel = procBtn.textContent;
+  procBtn.disabled = true;
+  procBtn.textContent = "Processing...";
 
-  if (status !== 200) {
-    setMsg(msgEl, "Failed to process transcript.", false);
-    outputBox.style.display = "none";
-    logTable.style.display = "none";
-    return;
+  try {
+    const payload = formatted_output.trim()
+      ? { asr_output, formatted_output }
+      : { asr_output };
+    const { status, data } = await api("POST", "/process", payload);
+
+    if (status !== 200) {
+      const errMsg = typeof data === "string"
+        ? data
+        : (data && data.detail ? (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail)) : JSON.stringify(data));
+      const lower = errMsg.toLowerCase();
+      if (lower.includes("503") || lower.includes("unavailable") || lower.includes("high demand")) {
+        setMsg(msgEl, "Gemini API is temporarily unavailable (503). This is a Google service issue, not a system error. Please wait 30 seconds and try again.", false);
+      } else {
+        setMsg(msgEl, "Error: " + errMsg, false);
+      }
+      outputBox.style.display = "none";
+      logTable.style.display = "none";
+      return;
+    }
+
+    setMsg(msgEl, "Processed.", true);
+    outputBox.style.display = "block";
+    outputBox.textContent = data.memory_aware_output || "(empty)";
+
+    logBody.innerHTML = "";
+    for (const d of data.intervention_log) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(d.token)}</td>
+        <td class="decision-${d.decision}">${escapeHtml(d.decision)}</td>
+        <td>${escapeHtml(d.reason)}</td>
+      `;
+      logBody.appendChild(tr);
+    }
+    logTable.style.display = data.intervention_log.length ? "table" : "none";
+  } finally {
+    procBtn.disabled = false;
+    procBtn.textContent = originalLabel;
   }
-
-  setMsg(msgEl, "Processed.", true);
-  outputBox.style.display = "block";
-  outputBox.textContent = data.memory_aware_output || "(empty)";
-
-  logBody.innerHTML = "";
-  for (const d of data.intervention_log) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${escapeHtml(d.token)}</td>
-      <td class="decision-${d.decision}">${escapeHtml(d.decision)}</td>
-      <td>${escapeHtml(d.reason)}</td>
-    `;
-    logBody.appendChild(tr);
-  }
-  logTable.style.display = data.intervention_log.length ? "table" : "none";
 };
 
 document.getElementById("corr-btn").onclick = async () => {

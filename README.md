@@ -114,16 +114,19 @@ Finally, this is a single-user demo: `user_id` is read from an environment varia
               punctuation per token)
                           │
                           ▼
-        ┌─── per token ─────────────────────┐
-        │  Stage 1: exact variant match?     │
-        │     yes → APPLY (unless entry is   │
-        │           suppressed/needs_review, │
-        │           then ABSTAIN)            │
-        │     no ↓                           │
-        │  Stage 2: phonetic hash match?     │
-        │     yes → ABSTAIN (candidate only) │
-        │     no  → PASS                     │
-        └────────────────────────────────────┘
+        ┌─── per token ──────────────────────────┐
+        │  Stage 1: match in memory?              │
+        │     canonical match → PASS              │
+        │       (token is already correct)        │
+        │     exact variant match:                │
+        │       status active → APPLY             │
+        │       status suppressed/needs_review    │
+        │                      → ABSTAIN          │
+        │     no Stage 1 match ↓                  │
+        │  Stage 2: phonetic hash match?          │
+        │     yes → ABSTAIN (candidate only)      │
+        │     no  → PASS                          │
+        └────────────────────────────────────────┘
                           │
                           ▼
       memory_aware_output + intervention_log

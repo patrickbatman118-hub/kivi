@@ -590,21 +590,21 @@
       ],
       "actual_memory_state": [
         {
-          "id": "c40434c3-0d4a-4eb1-8e34-5ad96f737b11",
+          "id": "00658842-338d-4010-9c8b-dcd595b5cbf5",
           "canonical_form": "Aaditya",
           "category": "custom_spelling",
           "status": "active",
           "evidence_source": "manual_correction",
           "confidence": "high",
           "phonetic_hash": "ATT",
-          "created_at": "2026-09-06T12:03:00.395677Z",
-          "last_seen_at": "2026-09-06T12:03:00.395677Z",
+          "created_at": "2026-09-09T09:17:41.275321Z",
+          "last_seen_at": "2026-09-09T09:17:41.275321Z",
           "variants": [
             {
               "variant_text": "Aditya",
-              "id": "eeda3140-0c50-499f-9579-effb68f4d01d",
+              "id": "8286a826-73cc-4917-a374-1d34ef081a6a",
               "source": "user_provided",
-              "created_at": "2026-09-06T12:03:00.395677Z"
+              "created_at": "2026-09-09T09:17:41.275321Z"
             }
           ]
         }
@@ -634,27 +634,27 @@
       ],
       "actual_memory_state": [
         {
-          "id": "c7598b2c-5e76-4789-809a-1119afe5f1f3",
+          "id": "61ff1043-7fe4-4086-842c-b4cda223115e",
           "canonical_form": "Aaditya",
           "category": "person_name",
           "status": "active",
           "evidence_source": "explicit_input",
           "confidence": "high",
           "phonetic_hash": "ATT",
-          "created_at": "2026-09-06T12:03:00.415957Z",
-          "last_seen_at": "2026-09-06T12:03:00.415957Z",
+          "created_at": "2026-09-09T09:17:41.286172Z",
+          "last_seen_at": "2026-09-09T09:17:41.286172Z",
           "variants": [
             {
               "variant_text": "Aditya",
-              "id": "42b8d7ca-d760-4055-840f-f63b9e1b2f81",
+              "id": "8f9e978f-57be-4c29-959b-6e36bf769314",
               "source": "user_provided",
-              "created_at": "2026-09-06T12:03:00.415957Z"
+              "created_at": "2026-09-09T09:17:41.286172Z"
             },
             {
               "variant_text": "Adithya",
-              "id": "821efcb1-4bdb-4acf-80a5-b70802ca5feb",
+              "id": "af3f00ad-9aa8-4d82-a249-05e69fe0e3ae",
               "source": "user_provided",
-              "created_at": "2026-09-06T12:03:00.419931Z"
+              "created_at": "2026-09-09T09:17:41.289650Z"
             }
           ]
         }
@@ -681,9 +681,9 @@
       "actual_response": {
         "status": "conflict",
         "message": "Phonetic hash collision detected with existing entry. Entry created with status needs_review.",
-        "conflicting_entry_id": "3eafa2de-7f87-4014-b318-d8b401d126ca",
+        "conflicting_entry_id": "6d6a57c9-c001-4cd1-8fd3-04bbef1687ec",
         "entry": {
-          "id": "17e5b45c-4c3d-4760-bd0a-f2b03c4789d1",
+          "id": "e625b867-9cee-4831-9b33-696ae584434d",
           "canonical_form": "Aaditya",
           "status": "needs_review"
         }
@@ -718,21 +718,21 @@
       "passed": true,
       "actual_memory": [
         {
-          "id": "20352ec7-4a2c-4d31-8e24-31ea56a93d69",
+          "id": "d2bbb27c-7f19-43c1-ac19-124c4157ca51",
           "canonical_form": "Aaditya",
           "category": "person_name",
           "status": "suppressed",
           "evidence_source": "explicit_input",
           "confidence": "high",
           "phonetic_hash": "ATT",
-          "created_at": "2026-09-06T12:03:00.474323Z",
-          "last_seen_at": "2026-09-06T12:03:00.474323Z",
+          "created_at": "2026-09-09T09:17:41.341738Z",
+          "last_seen_at": "2026-09-09T09:17:41.341738Z",
           "variants": [
             {
               "variant_text": "Aditya",
-              "id": "87c07b1f-a8f3-4b6f-9b52-384294800d17",
+              "id": "9b7ebad1-0323-485a-8abb-4c84384de610",
               "source": "user_provided",
-              "created_at": "2026-09-06T12:03:00.474323Z"
+              "created_at": "2026-09-09T09:17:41.341738Z"
             }
           ]
         }
